@@ -5,20 +5,14 @@ cd('D:\Bivariate_Granger_Loop_Trial');
 workDir='D:\Bivariate_Granger_Loop_Trial\';
 source = ['D:\Bivariate_Granger_Loop_Trial', filesep, '301_BL_7ICArejected.mat'];
 load(source);
+
+%remove SO1 channel
+EEG.allchan(43) = []
+
 % define autoregression parameters
 order = 14;
-% define channels to compute granger synchrony between
-EEG.allchan(43) = [] %remove SO1 channel
-% 
-%  field1 = [chan1name, '_to_', chan2name]
-%  field2 = [chan2name, '_to_', chan1name]
-%  value1 = x2yT
-%  value2 = y2xT
-%  dat_output = struct(field1,value1,field2,value2);
-%  dat_output.x2yT = zeros(1,EEG.pnts);
-%  dat_output.y2xT = zeros(1,EEG.pnts);
-% dat_output = struct([])
 
+% define channels to compute granger synchrony between
 for a = 1:numel(EEG.allchan)
     for b = 1:numel(EEG.allchan)
 chan1name = EEG.allchan(a).labels

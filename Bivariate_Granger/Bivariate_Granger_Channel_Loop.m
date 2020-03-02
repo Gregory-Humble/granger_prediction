@@ -9,8 +9,15 @@ load(source);
 order = 14;
 % define channels to compute granger synchrony between
 EEG.allchan(43) = [] %remove SO1 channel
-
-dat_output = []
+% 
+%  field1 = [chan1name, '_to_', chan2name]
+%  field2 = [chan2name, '_to_', chan1name]
+%  value1 = x2yT
+%  value2 = y2xT
+%  dat_output = struct(field1,value1,field2,value2);
+%  dat_output.x2yT = zeros(1,EEG.pnts);
+%  dat_output.y2xT = zeros(1,EEG.pnts);
+% dat_output = struct([])
 
 for a = 1:numel(EEG.allchan)
     for b = 1:numel(EEG.allchan)
@@ -108,11 +115,23 @@ for timei=1:EEG.pnts-win
     
     y2xT(timei) = log(Ex/E(1,1));
     x2yT(timei) = log(Ey/E(2,2));
-    dat_output(a,:) = y2xT
-    dat_output(a,1001,:) = x2yT
+%  field1 = [chan1name, '_to_', chan2name];
+%  field2 = [chan2name, '_to_', chan1name];
+%  value1 = x2yT;
+%  value2 = y2xT;
+%  num2str(['dat_output_',chan1name, '_to_',chan2name]) = struct(field1,value1,field2,value2);
 end
-
+ field1 = [chan1name, '_to_', chan2name];
+ field2 = [chan2name, '_to_', chan1name];
+ value1 = x2yT;
+ value2 = y2xT;
+ %dat_output = struct(field1,value1,field2,value2);
+ 
+ dat_output.(field1)=value1;
+ dat_output.(field2)=value2;
+ 
     end
+
 end
 
 % draw lines

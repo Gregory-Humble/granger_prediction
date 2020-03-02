@@ -129,11 +129,11 @@ end
 end
 
 % draw lines
-figure(15), clf, hold on
+figure(1), clf, hold on
 
-plot(EEG.times,x2yT)
-plot(EEG.times,y2xT,'r')
-legend({[ 'GC: ' chan1name ' -> ' chan2name ];[ 'GC: ' chan2name ' -> ' chan1name ]})
+plot(EEG.times,dat_output.AF4_to_AF3)
+plot(EEG.times,dat_output.AF3_to_AF4,'r')
+legend({[ 'GC: AF3 -> AF4' ];[ 'GC: AF4 -> AF3' ]})
 
 title([ 'Window length: ' num2str(iwin) ' ms, order: ' num2str(iorder) ' ms' ])
 xlabel('Time (ms)')

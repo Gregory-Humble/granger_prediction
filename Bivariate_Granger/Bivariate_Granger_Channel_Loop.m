@@ -128,7 +128,7 @@ end
 
 end
 
-% draw lines
+% plot single granger graph
 figure(1), clf, hold on
 
 plot(EEG.times,dat_output.AF4_to_AF3)

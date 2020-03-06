@@ -1,16 +1,30 @@
 %% Bivariate looped over all channel combinations
 clear all; close all; clc;
 
-cd('D:\Bivariate_Granger_Loop_Trial');
-workDir='D:\Bivariate_Granger_Loop_Trial\';
-source = ['D:\Bivariate_Granger_Loop_Trial', filesep, '301_BL_7ICArejected.mat'];
+cd('E:\Bivariate_Granger_Loop_Trial');
+workDir='E:\Bivariate_Granger_Loop_Trial';
+source = ['E:\Bivariate_Granger_Loop_Trial', filesep, '343_END_7ICArejected.mat'];
 load(source);
+EEG.GC = [];
 
 %remove SO1 channel
-EEG.allchan(43) = []
+EEG.allchan(43) = [];
 
 % define autoregression parameters
 order = 14;
+vec = zeros([1,1000]);
+
+%list of chan names
+channames = ({EEG.allchan.labels});
+
+%creating EEG.GC struct consisting of 42 timetables for all channel names
+TT = timetable(vec', 'SampleRate', 500);
+EEG.GC = struct('AF3', TT, 'AF4', TT, 'F7', TT, 'F5', TT, 'F3', TT, 'F1', TT, 'FZ', TT, 'F2', TT, 'F4', TT, 'F6', TT, 'F8', TT, 'FC5', TT, 'FC3', TT, 'FC1', TT, 'FCZ', TT, 'FC2', TT, 'FC4', TT, 'FC6', TT, 'C5', TT, 'C3', TT, 'C1', TT, 'CZ', TT, 'C2', TT, 'C4', TT, 'C6', TT, 'M1', TT, 'M2', TT, 'P7', TT, 'P5', TT, 'P3', TT, 'P1', TT, 'PZ', TT, 'P2', TT, 'P4', TT, 'P6', TT, 'PO3', TT, 'POZ', TT, 'PO4', TT, 'O1', TT, 'OZ', TT, 'O2', TT);
+
+% for z = 1:numel(allchanlist);
+% electrode = allchanlist(z);
+% Granger_Values_TimeTable(z) = matlab.lang.makeValidName(strcat({'GrangerValuesTimeTable'}, [electrode]));
+% end
 
 % define channels to compute granger synchrony between
 for a = 1:numel(EEG.allchan)
@@ -119,23 +133,40 @@ end
  field2 = [chan2name, '_to_', chan1name];
  value1 = x2yT;
  value2 = y2xT;
- %dat_output = struct(field1,value1,field2,value2);
- 
- dat_output.(field1)=value1;
- dat_output.(field2)=value2;
- 
-    end
 
+
+% Creates a timetable with column vectors of the granger time series for
+% each channel-channel  pair
+EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value1', 'NewVariableNames', {field1});
+EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value2', 'NewVariableNames', {field2});
+  
+    end
 end
 
+%% Save
+% save('301_BL_7ICArejected.mat', 'EEG')
+%% Export
+%export as excel
+writetimetable(Granger_Values_TimeTable, '_bivariate_granger_time_series_values.csv')
+
+%%
 % plot single granger graph
-figure(1), clf, hold on
+% figure(1), clf, hold on
+%     
+% subplot(2,1,1)
+% plot(EEG.times,)
+% hold on
+% plot(EEG.times,[fig2plotchan2],'r')
+% legend({[ 'GC: ' [fig2plotchan1] ];[ 'GC: ' [fig2plotchan2] ]})
+% 
+% subplot(2,1,2)
+% plot(EEG.times,dat_output.AF3_to_F3)
+% hold on
+% plot(EEG.times,dat_output.F3_to_AF3,'r')
+% legend({[ 'GC: AF3 -> F3' ];[ 'GC: F3 -> AF3' ]})
+% 
+% title([ 'Window length: ' num2str(iwin) ' ms, order: ' num2str(iorder) ' ms' ])
+% xlabel('Time (ms)')
+% ylabel('Granger prediction estimate')
+% set(gca,'xlim',[0 1700])
 
-plot(EEG.times,dat_output.AF4_to_AF3)
-plot(EEG.times,dat_output.AF3_to_AF4,'r')
-legend({[ 'GC: AF3 -> AF4' ];[ 'GC: AF4 -> AF3' ]})
-
-title([ 'Window length: ' num2str(iwin) ' ms, order: ' num2str(iorder) ' ms' ])
-xlabel('Time (ms)')
-ylabel('Granger prediction estimate')
-set(gca,'xlim',[0 1700])

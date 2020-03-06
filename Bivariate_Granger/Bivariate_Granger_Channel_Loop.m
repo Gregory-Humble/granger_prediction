@@ -19,7 +19,7 @@ channames = ({EEG.allchan.labels});
 
 %creating EEG.GC struct consisting of 42 timetables for all channel names
 TT = timetable(vec', 'SampleRate', 500);
-EEG.GC = struct('AF3', TT, 'AF4', TT, 'F7', TT, 'F5', TT, 'F3', TT, 'F1', TT, 'FZ', TT, 'F2', TT, 'F4', TT, 'F6', TT, 'F8', TT, 'FC5', TT, 'FC3', TT, 'FC1', TT, 'FCZ', TT, 'FC2', TT, 'FC4', TT, 'FC6', TT, 'C5', TT, 'C3', TT, 'C1', TT, 'CZ', TT, 'C2', TT, 'C4', TT, 'C6', TT, 'M1', TT, 'M2', TT, 'P7', TT, 'P5', TT, 'P3', TT, 'P1', TT, 'PZ', TT, 'P2', TT, 'P4', TT, 'P6', TT, 'PO3', TT, 'POZ', TT, 'PO4', TT, 'O1', TT, 'OZ', TT, 'O2', TT);
+EEG.GC = struct('AF3', TT, 'AF4', TT, 'F7', TT, 'F5', TT, 'F3', TT, 'F1', TT, 'FZ', TT, 'F2', TT, 'F4', TT, 'F6', TT, 'F8', TT, 'FC5', TT, 'FC3', TT, 'FC1', TT, 'FCZ', TT, 'FC2', TT, 'FC4', TT, 'FC6', TT, 'C5', TT, 'C3', TT, 'C1', TT, 'CZ', TT, 'C2', TT, 'C4', TT, 'C6', TT, 'M1', TT, 'M2', TT, 'P7', TT, 'P5', TT, 'P3', TT, 'P1', TT, 'PZ', TT, 'P2', TT, 'P4', TT, 'P6', TT, 'P8', TT, 'PO3', TT, 'POZ', TT, 'PO4', TT, 'O1', TT, 'OZ', TT, 'O2', TT);
 
 % for z = 1:numel(allchanlist);
 % electrode = allchanlist(z);
@@ -65,7 +65,7 @@ for i = order+1:EEG.pnts
     y(i-1) = thispointY;
 end 
 
-
+%% plot figure
 % figure(1), clf
 % subplot(211)
 % plot(EEG.times,EEG.data(chan1,:,1),'b', EEG.times,x,'r')
@@ -75,8 +75,7 @@ end
 % plot(EEG.times,EEG.data(chan2,:,1),'b', EEG.times,y,'r')
 % legend({'Real data';'Reconstructed from ARmodel'})
 
-% Granger prediction
-
+%% Granger prediction
 
 % Bivariate autoregression and associated error term
 [Axy,E] = armorf(EEG.data([chan1 chan2],:,1),1,EEG.pnts,order);
@@ -123,12 +122,10 @@ for timei=1:EEG.pnts-win
     
     y2xT(timei) = log(Ex/E(1,1));
     x2yT(timei) = log(Ey/E(2,2));
-%  field1 = [chan1name, '_to_', chan2name];
-%  field2 = [chan2name, '_to_', chan1name];
-%  value1 = x2yT;
-%  value2 = y2xT;
-%  num2str(['dat_output_',chan1name, '_to_',chan2name]) = struct(field1,value1,field2,value2);
+
 end
+ %creates field names of specific channel comparisons based on the current
+ %loop iteration.
  field1 = [chan1name, '_to_', chan2name];
  field2 = [chan2name, '_to_', chan1name];
  value1 = x2yT;
@@ -141,15 +138,23 @@ EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value1', 'NewVariableNames', {f
 EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value2', 'NewVariableNames', {field2});
   
     end
+%% save timetable output     
+writetimetable(EEG.GC.(chan1name), [chan1name, '_bivariate_granger_time_series_values.csv'])
 end
 
-%% Save
-% save('301_BL_7ICArejected.mat', 'EEG')
-%% Export
-%export as excel
-writetimetable(Granger_Values_TimeTable, '_bivariate_granger_time_series_values.csv')
+%% Save whole EEG struct
+%save(['EEG_343_bivariate_granger_time_series_values.mat'], 'EEG')
 
-%%
+%% Save whole workspace 
+%save(['EEG_343_bivariate_granger_time_series_values.mat'])
+
+%% Load whole EEG struct
+%load(['EEG_343_bivariate_granger_time_series_values.mat'], 'EEG')
+
+%% Load whole workspace 
+%load(['EEG_343_bivariate_granger_time_series_values.mat'])
+
+%% Plot figures
 % plot single granger graph
 % figure(1), clf, hold on
 %     

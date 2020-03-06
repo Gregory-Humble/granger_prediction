@@ -1,10 +1,11 @@
 %% Bivariate looped over all channel combinations
 clear all; close all; clc;
-
 cd('E:\Bivariate_Granger_Loop_Trial');
 workDir='E:\Bivariate_Granger_Loop_Trial';
 source = ['E:\Bivariate_Granger_Loop_Trial', filesep, '343_END_7ICArejected.mat'];
 load(source);
+
+%creates empty Granger Causality GC struct under EEG
 EEG.GC = [];
 
 %remove SO1 channel
@@ -12,19 +13,14 @@ EEG.allchan(43) = [];
 
 % define autoregression parameters
 order = 14;
-vec = zeros([1,1000]);
 
 %list of chan names
 channames = ({EEG.allchan.labels});
 
-%creating EEG.GC struct consisting of 42 timetables for all channel names
-TT = timetable(vec', 'SampleRate', 500);
+%creating EEG.GC struct timetables consisting of 42 timetables for all channel names
+vec = zeros([1,1000]); % vector of zeroes to initialise the timetable
+TT = timetable(vec', 'SampleRate', 500); %create timetable with transposed vec zeroes into column format
 EEG.GC = struct('AF3', TT, 'AF4', TT, 'F7', TT, 'F5', TT, 'F3', TT, 'F1', TT, 'FZ', TT, 'F2', TT, 'F4', TT, 'F6', TT, 'F8', TT, 'FC5', TT, 'FC3', TT, 'FC1', TT, 'FCZ', TT, 'FC2', TT, 'FC4', TT, 'FC6', TT, 'C5', TT, 'C3', TT, 'C1', TT, 'CZ', TT, 'C2', TT, 'C4', TT, 'C6', TT, 'M1', TT, 'M2', TT, 'P7', TT, 'P5', TT, 'P3', TT, 'P1', TT, 'PZ', TT, 'P2', TT, 'P4', TT, 'P6', TT, 'P8', TT, 'PO3', TT, 'POZ', TT, 'PO4', TT, 'O1', TT, 'OZ', TT, 'O2', TT);
-
-% for z = 1:numel(allchanlist);
-% electrode = allchanlist(z);
-% Granger_Values_TimeTable(z) = matlab.lang.makeValidName(strcat({'GrangerValuesTimeTable'}, [electrode]));
-% end
 
 % define channels to compute granger synchrony between
 for a = 1:numel(EEG.allchan)

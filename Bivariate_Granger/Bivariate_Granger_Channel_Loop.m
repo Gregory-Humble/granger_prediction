@@ -1,10 +1,40 @@
 %% Bivariate looped over all channel combinations
 clear all; close all; clc;
-cd('E:\Bivariate_Granger_Loop_Trial');
-workDir='E:\Bivariate_Granger_Loop_Trial';
-source = ['E:\Bivariate_Granger_Loop_Trial', filesep, '343_END_7ICArejected.mat'];
+cd('E:\Bivariate_Granger_Loop_Trial\Data');
+workDir = 'E:\Bivariate_Granger_Loop_Trial';
+saveDir = 'E:\Bivariate_Granger_Loop_Trial\Granger_Causality';
+mkdir(saveDir);
+eeglab;
+
+%% change .set file to .mat via EEGlab to prevent EEG struct to EEG obj errors
+IDlist = {'301', '302', '303', '305', '306', '307', '308', '309', '310', '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};  
+ConditionList = {'BL', 'END'};
+
+% [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
+%  for t = 1:numel(IDlist);
+%     for w = 1:numel(ConditionList);
+% EEG = pop_loadset('filename', [IDlist{t} '_' ConditionList{w} '_7ICArejected.set'],'filepath','E:\\Bivariate_Granger_Loop_Trial\\Data\\');
+% [ALLEEG, EEG, CURRENTSET] = eeg_store( ALLEEG, EEG, 0 );
+% save([IDlist{t} '_' ConditionList{w} '_7ICArejected.mat'])
+%     end
+%  end
+
+%% create list of folders
+cd(saveDir)
+% for q = 1:numel(IDlist);
+%     thisID = IDlist{q};
+%     newDir = [saveDir, filesep, thisID];
+%     mkdir(newDir);
+% end
+%% Load .mat file to run GC analysis
+for t = 1:numel(IDlist);
+   for w = 1:numel(ConditionList);
+source = ['E:\Bivariate_Granger_Loop_Trial\Data', filesep, IDlist{t}, '_' ConditionList{w}, '_7ICArejected.mat'];
 load(source);
 
+%% change directory to output/save folder
+cd(saveDir);
+%%
 %creates empty Granger Causality GC struct under EEG
 EEG.GC = [];
 
@@ -27,7 +57,7 @@ for a = 1:numel(EEG.allchan)
     for b = 1:numel(EEG.allchan)
 chan1name = EEG.allchan(a).labels
 chan2name = EEG.allchan(b).labels
-        if a == b
+        if b == a
             continue
         end
 
@@ -135,7 +165,13 @@ EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value2', 'NewVariableNames', {f
   
     end
 %% save timetable output     
-writetimetable(EEG.GC.(chan1name), [chan1name, '_bivariate_granger_time_series_values.csv'])
+thisDir = [saveDir,filesep,IDlist{t}]
+cd(thisDir)
+writetimetable(EEG.GC.(chan1name), [chan1name, '_', IDlist{t}, '_', ConditionList{w}, '_bivariate_granger_time_series_values.csv'])
+%need to save EEG.GC as well
+% need to save in individual subject folders 
+end
+   end
 end
 
 %% Save whole EEG struct

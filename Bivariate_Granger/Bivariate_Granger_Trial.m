@@ -6,7 +6,7 @@ workDir='D:\Bivariate_Granger_Loop_Trial\';
 source = ['D:\Bivariate_Granger_Loop_Trial', filesep, '301_BL_7ICArejected.mat'];
 load(source);
 % define autoregression parameters
-order = 14;
+order = 10;
 % define channels to compute granger synchrony between
 EEG.allchan(43) = [] %remove SO1 channel
 

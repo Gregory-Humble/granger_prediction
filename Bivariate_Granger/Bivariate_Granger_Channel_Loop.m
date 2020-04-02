@@ -1,13 +1,17 @@
 %% Bivariate looped over all channel combinations
+
+%clears everything to start fresh and clean!
 clear all; close all; clc;
+
 cd('E:\Bivariate_Granger_Loop_Trial\Data');
 workDir = 'E:\Bivariate_Granger_Loop_Trial';
 saveDir = 'E:\Bivariate_Granger_Loop_Trial\Granger_Causality';
-mkdir(saveDir);
+%mkdir(saveDir);
 eeglab;
 %
 %% change .set file to .mat via EEGlab to prevent EEG struct to EEG obj errors
-IDlist = {'301', '302', '303', '305', '306', '307', '308', '309', '310', '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};  
+% IDlist = {'301', '302', '303', '305', '306', '307', '308', '309', '310', '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};  
+IDlist = {'313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};
 ConditionList = {'BL', 'END'};
 
 % [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
@@ -42,7 +46,7 @@ EEG.GC = [];
 EEG.allchan(43) = [];
 
 % define autoregression parameters
-order = 14;
+order = 10;
 
 %list of chan names
 channames = ({EEG.allchan.labels});

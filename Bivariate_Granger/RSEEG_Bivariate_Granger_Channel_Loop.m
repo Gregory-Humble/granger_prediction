@@ -5,7 +5,7 @@ clear all; close all; clc;
 
 cd('E:\Bivariate_Granger_Loop_Trial\Data');
 workDir = 'E:\Bivariate_Granger_Loop_Trial';
-saveDir = 'E:\Bivariate_Granger_Loop_Trial\Granger_Causality';
+saveDir = 'E:\Bivariate_Granger_Loop_Trial\Granger_Causality_RSEEG';
 %mkdir(saveDir);
 eeglab;
 
@@ -173,7 +173,7 @@ EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value2', 'NewVariableNames', {f
 %% save timetable output     
 thisDir = [saveDir,filesep,IDlist{thisID}]
 cd(thisDir)
-writetimetable(EEG.GC.(chan1name), [chan1name, '_', IDlist{thisID}, '_', ConditionList{thisCondition}, '_bivariate_granger_time_series_values.csv'])
+writetimetable(EEG.GC.(chan1name), [chan1name, '_', IDlist{thisID}, '_', ConditionList{thisCondition}, 'RSEEG_bivariate_granger_time_series_values.csv'])
 %need to save EEG.GC as well
 % need to save in individual subject folders 
     end

@@ -8,11 +8,12 @@ workDir = 'E:\Bivariate_Granger_Loop_Trial';
 saveDir = 'E:\Bivariate_Granger_Loop_Trial\Granger_Causality';
 %mkdir(saveDir);
 eeglab;
-%
+
 %% change .set file to .mat via EEGlab to prevent EEG struct to EEG obj errors
 % IDlist = {'301', '302', '303', '305', '306', '307', '308', '309', '310', '311', '312', '313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};  
-IDlist = {'313', '314', '315', '316', '317', '318', '319', '320', '322', '324', '325', '326', '327', '328', '329', '330', '331', '333', '335', '336', '338', '341', '343', '345', '346', '347', '348', '349', '351'};
-ConditionList = {'BL', 'END'};
+IDlist = {'302'};
+% ConditionList = {'BL', 'END'}
+ConditionList = {'BL'};
 
 % [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
 %  for t = 1:numel(IDlist);
@@ -24,18 +25,17 @@ ConditionList = {'BL', 'END'};
 %  end
 
 %% create list of folders
-cd(saveDir)
+cd(saveDir);
 % for q = 1:numel(IDlist);
 %     thisID = IDlist{q};
 %     newDir = [saveDir, filesep, thisID];
 %     mkdir(newDir);
 % end
 %% Load .mat file to run GC analysis
-for t = 1:numel(IDlist);
-   for w = 1:numel(ConditionList);
-source = ['E:\Bivariate_Granger_Loop_Trial\Data', filesep, IDlist{t}, '_' ConditionList{w}, '_7ICArejected.mat'];
-load(source);
-
+for thisID = 1:numel(IDlist);
+   for thisCondition = 1:numel(ConditionList);
+source = ['E:\Bivariate_Granger_Loop_Trial\Data', filesep, IDlist{thisID}, '_' ConditionList{thisCondition}, '_7ICArejected.mat']
+load(source, 'ALLCOM', 'ALLEEG', 'CURRENTSET', 'CURRENTSTUDY', 'EEG', 'globalvars', 'LASTCOM', 'PLUGINLIST', 'STUDY');
 %% change directory to output/save folder
 cd(saveDir);
 %%
@@ -57,43 +57,43 @@ TT = timetable(vec', 'SampleRate', 500); %create timetable with transposed vec z
 EEG.GC = struct('AF3', TT, 'AF4', TT, 'F7', TT, 'F5', TT, 'F3', TT, 'F1', TT, 'FZ', TT, 'F2', TT, 'F4', TT, 'F6', TT, 'F8', TT, 'FC5', TT, 'FC3', TT, 'FC1', TT, 'FCZ', TT, 'FC2', TT, 'FC4', TT, 'FC6', TT, 'C5', TT, 'C3', TT, 'C1', TT, 'CZ', TT, 'C2', TT, 'C4', TT, 'C6', TT, 'M1', TT, 'M2', TT, 'P7', TT, 'P5', TT, 'P3', TT, 'P1', TT, 'PZ', TT, 'P2', TT, 'P4', TT, 'P6', TT, 'P8', TT, 'PO3', TT, 'POZ', TT, 'PO4', TT, 'O1', TT, 'OZ', TT, 'O2', TT);
 
 % define channels to compute granger synchrony between
-for a = 1:numel(EEG.allchan)
-    for b = 1:numel(EEG.allchan)
-chan1name = EEG.allchan(a).labels
-chan2name = EEG.allchan(b).labels
-        if b == a
+for aa = 1:numel(EEG.allchan)
+    for bb = 1:numel(EEG.allchan)
+chan1name = EEG.allchan(aa).labels
+chan2name = EEG.allchan(bb).labels
+        if bb == aa
             continue
         end
 
 % find the index of those channels
-chan1 = find( strcmpi(chan1name,{EEG.chanlocs.labels}) )
-chan2 = find( strcmpi(chan2name,{EEG.chanlocs.labels}) )
+chan1 = find( strcmpi(chan1name,{EEG.chanlocs.labels}) );
+chan2 = find( strcmpi(chan2name,{EEG.chanlocs.labels}) );
 
 % get AR coefficients and error from each signal
 [Ax,Ex] = armorf(EEG.data(chan1,:,1),1,EEG.pnts,order);
 [Ay,Ey] = armorf(EEG.data(chan2,:,1),1,EEG.pnts,order);
 
 %%% reconstruct the data using the autoregressive coefficients
-x = zeros(1,EEG.pnts);
-y = zeros(1,EEG.pnts);
-
-x(1:order) = EEG.data(chan1,1:order,1);
-y(1:order) = EEG.data(chan2,1:order,1);
-
-
-for i = order+1:EEG.pnts
-    
-    % initialize
-    thispointX = 0;
-    thispointY = 0;
-    
-    for ai=1:order
-        thispointX = thispointX + EEG.data(chan1,i-ai,1)*Ax(ai);
-        thispointY = thispointY + EEG.data(chan2,i-ai,1)*Ay(ai);
-    end
-    x(i-1) = thispointX;
-    y(i-1) = thispointY;
-end 
+% x = zeros(1,EEG.pnts);
+% y = zeros(1,EEG.pnts);
+% 
+% x(1:order) = EEG.data(chan1,1:order,1);
+% y(1:order) = EEG.data(chan2,1:order,1);
+% 
+% 
+% for i = order+1:EEG.pnts
+%     
+%     % initialize
+%     thispointX = 0;
+%     thispointY = 0;
+%     
+%     for ai=1:order
+%         thispointX = thispointX + EEG.data(chan1,i-ai,1)*Ax(ai);
+%         thispointY = thispointY + EEG.data(chan2,i-ai,1)*Ay(ai);
+%     end
+%     x(i-1) = thispointX;
+%     y(i-1) = thispointY;
+% end 
 
 %% plot figure
 % figure(1), clf
@@ -108,17 +108,17 @@ end
 %% Granger prediction
 
 % Bivariate autoregression and associated error term
-[Axy,E] = armorf(EEG.data([chan1 chan2],:,1),1,EEG.pnts,order);
-
-
-% time-domain causal estimate
-granger_chan2_to_chan1 = log(Ex/E(1,1));
-granger_chan1_to_chan2 = log(Ey/E(2,2));
-
-disp([ 'Granger prediction from ' chan1name ' to ' chan2name ' is ' num2str(granger_chan1_to_chan2) ]);
-disp([ 'Granger prediction from ' chan2name ' to ' chan1name ' is ' num2str(granger_chan2_to_chan1) ]);
-
-% compute granger prediction over time
+% [Axy,E] = armorf(EEG.data([chan1 chan2],:,1),1,EEG.pnts,order);
+% 
+% 
+% % time-domain causal estimate
+% granger_chan2_to_chan1 = log(Ex/E(1,1)); % Ex is the variance of the univariate AR errors - E is the variance of the bivariate AR errors
+% granger_chan1_to_chan2 = log(Ey/E(2,2));
+% 
+% disp([ 'Granger prediction from ' chan1name ' to ' chan2name ' is ' num2str(granger_chan1_to_chan2) ]);
+% disp([ 'Granger prediction from ' chan2name ' to ' chan1name ' is ' num2str(granger_chan2_to_chan1) ]);
+% 
+% % compute granger prediction over time
 
 % initialize
     
@@ -128,7 +128,7 @@ y2xT = zeros(1,EEG.pnts);
 
 % GC parameters
 iwin   = 300; % window size in ms
-iorder = 15;  % in ms
+iorder = 20;  % in ms
 
 
 % convert window/order to points
@@ -156,6 +156,8 @@ for timei=1:EEG.pnts-win
 end
  %creates field names of specific channel comparisons based on the current
  %loop iteration.
+ % the following line gives us the AR causal estimate for ONE time window
+ % (model order in pnts)
  field1 = [chan1name, '_to_', chan2name];
  field2 = [chan2name, '_to_', chan1name];
  value1 = x2yT;
@@ -167,15 +169,15 @@ end
 EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value1', 'NewVariableNames', {field1});
 EEG.GC.(chan1name) = addvars(EEG.GC.(chan1name), value2', 'NewVariableNames', {field2});
   
-    end
+        end
 %% save timetable output     
-thisDir = [saveDir,filesep,IDlist{t}]
+thisDir = [saveDir,filesep,IDlist{thisID}]
 cd(thisDir)
-writetimetable(EEG.GC.(chan1name), [chan1name, '_', IDlist{t}, '_', ConditionList{w}, '_bivariate_granger_time_series_values.csv'])
+writetimetable(EEG.GC.(chan1name), [chan1name, '_', IDlist{thisID}, '_', ConditionList{thisCondition}, '_bivariate_granger_time_series_values.csv'])
 %need to save EEG.GC as well
 % need to save in individual subject folders 
+    end
 end
-   end
 end
 
 %% Save whole EEG struct

@@ -1,13 +1,13 @@
 clear all;
 close all;
 clc;
-% alz n = 40, controls = 18
-IDlist = {'301', '302', '303', '305', '306', '307', '308', '309', '310',...
-    '311', '312', '313', '314', '315', '316', '317', '318', '319', '320',...
-    '322', '324', '325', '326', '327', '328', '329', '330', '331', '333',...
-    '335', '336', '338', '341', '343', '345', '346', '347', '348', '349',...
-    '351', '101', '102', '103', '104', '105', '107', '108', '109', '110',...
-    '111', '112', '114', '115', '116', '117', '119', '120', '121'}; 
+% Alz n = 35, Control = 18
+IDlist = {'301', '302', '305', '306', '307', '308', '309', '310',...
+    '311', '312', '314', '315', '317', '318', '319', '320', '322',...
+    '324', '325', '326', '327', '328', '329', '330', '333', '335',...
+    '336', '338', '341', '343', '345', '346', '347', '348', '351',...
+    '102', '104', '105', '106', '107', '108', '109', '110', '111',...
+    '112', '114', '115', '116', '117', '118', '119', '120', '121'};  
 
 
 Channames = {'AF3', 'AF4', 'F7', 'F5', 'F1', 'FZ', 'F2', 'F4', 'F6', 'F8',...
@@ -15,9 +15,9 @@ Channames = {'AF3', 'AF4', 'F7', 'F5', 'F1', 'FZ', 'F2', 'F4', 'F6', 'F8',...
     'C2', 'C4', 'C6', 'P7', 'P5', 'P3', 'P1', 'PZ', 'P2', 'P4', 'P6', 'P8',...
     'PO3', 'POZ', 'PO4', 'O1', 'OZ', 'O2'};
 %% 
-cd('E:\Bivariate_Granger_Loop_Trial\Granger_Causality_RSEEG\model_order_10\');
+cd('E:\Bivariate_Granger_Loop_Trial\Granger_Causality_TMS_EEG\Model_Order_10\');
 for fi = 1:length(IDlist)
-    folto = ['E:\Bivariate_Granger_Loop_Trial\Granger_Causality_RSEEG\model_order_10\' IDlist{fi} '\'];
+    folto = ['E:\Bivariate_Granger_Loop_Trial\Granger_Causality_TMS_EEG\Model_Order_10\' IDlist{fi} '\'];
     cd(folto);
     dirList = dir;
     dirList(1:2) = [];
@@ -37,8 +37,13 @@ for fi = 1:length(IDlist)
         TT = removevars(T,{'Time'});
         TT = table2array(TT);
         TT(:,2:2:end) = [];
-        TT = mean(TT); % mean of each column - now a row vector 
-
+        %% N100 (85ms-145ms) - indices = 86 - 146
+        %TT = mean(TT); 
+        %TT = mean(TT([86:146],:),1);% mean of each column - now a row vector 
+        %% P200 190ms-250ms) - indices = 191 - 251
+%TT = mean(TT); 
+        TT = mean(TT([220:230],:),1);% mean of each column - now a row vector 
+        %%
 % adding 0's for perfect synchronisation between same channels
 %         if fi2 == 1
 %         GCMat(fi2,:) = [0 TT(1:end)];
@@ -63,6 +68,6 @@ clear GCMat;
 end
 %has to be channels x channels x subjects
 
-cd('E:\Bivariate_Granger_Loop_Trial\Granger_Causality_RSEEG\Granger_NBS\Model_10');
-save('Granger_RSEEG_DATASTRUCT_Model_10.mat','GC');
-save('Granger_RSEEG_NBS_Model_10.mat','GCNBS');
+cd('E:\Bivariate_Granger_Loop_Trial\Granger_Causality_TMS_EEG\Granger_NBS\Model_10_P200');
+save('Granger_TMS_EEG_P200_DATASTRUCT_Model_10.mat','GC');
+save('Granger_TMS_EEG_P200_NBS_Model_10.mat','GCNBS');
